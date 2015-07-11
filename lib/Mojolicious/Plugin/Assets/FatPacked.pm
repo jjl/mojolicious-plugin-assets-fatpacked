@@ -30,14 +30,15 @@ sub map_asset {
   my ($app, $module, $path, $r) = @_;
   try {
     require $module;
+    warn "path: $path";
     $r->get($path => sub {
+      my ($c) = @_;
       no strict 'refs';
-      ${"${module}::content"};
+      $c->render(text => ${"${module}::content"});
     });
   } catch {
     warn "Failed to load asset $module: $_\n";
   }
-  
 }
 
 =head2 register($self, $app, $conf) -> Void
@@ -54,6 +55,7 @@ sub map_asset {
 
 sub register {
   my ($self, $app, $conf) = @_;
+  warn "REGISTER-------------\n";
   my $prefix = $conf->{mountpoint} || '/assets';
   my $ns = $conf->{namespace} || ((ref $app) . "::Asset");
   my $r = Mojolicious::Routes->new;
